@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --color-nuit: #160a24;
+  --color-nuit-2: #221335;
+  --color-lime: #c8f04b;
+  --color-corail: #ff6f61;
+  --color-pamplemousse: #ff8fab;
+  --color-soleil: #ffd23f;
+  --color-menthe: #6fe3b5;
+  --color-lavande-douce: #b8a9e0;
+
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-nuit);
+  color: #f7f2ff;
+  font-family: var(--font-body);
+  overscroll-behavior-y: none;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ---- bulles flottantes ---- */
+@keyframes float-up {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: var(--bubble-o, 0.5); }
+  90% { opacity: var(--bubble-o, 0.5); }
+  100% { transform: translateY(-110vh) scale(1.15); opacity: 0; }
+}
+.bubble {
+  position: absolute;
+  bottom: -12vh;
+  border-radius: 9999px;
+  filter: blur(1px);
+  animation: float-up linear infinite;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(14px, -18px); }
+}
+.drift { animation: drift 7s ease-in-out infinite; }
+
+/* ---- halo agrumes derrière le hero ---- */
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.spin-slow { animation: spin-slow 40s linear infinite; }
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.06); }
+}
+.pulse-glow { animation: pulse-glow 5s ease-in-out infinite; }
+
+/* ---- versement du verre ---- */
+@keyframes pour-shine {
+  0% { transform: translateX(-120%) skewX(-12deg); }
+  100% { transform: translateX(240%) skewX(-12deg); }
+}
+.pour-shine {
+  animation: pour-shine 2.2s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+.wiggle { animation: wiggle 3.2s ease-in-out infinite; }
+
+/* ---- scrollbar discrète ---- */
+.nice-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+.nice-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 999px; }
+.nice-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* safe area bas pour la barre d'onglets */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
