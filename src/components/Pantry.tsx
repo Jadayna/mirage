@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Refrigerator, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
-import { PANTRY, RECIPES } from "../data";
+import { useI18n } from "../i18n";
 import { RecipeCard, SectionTitle } from "./ui";
 
 export default function Pantry({
@@ -17,45 +17,42 @@ export default function Pantry({
   toggleFav: (id: string) => void;
   onOpenRecipe: (id: string) => void;
 }) {
-  const [openCat, setOpenCat] = useState<string | null>(PANTRY[0].id);
+  const { t, recipeById } = useI18n();
+  const ui = t.ui;
+  const [openCat, setOpenCat] = useState<string | null>(t.pantry[0].id);
 
   const { ready, almost } = useMemo(() => {
     const ready: { id: string; missing: string[] }[] = [];
     const almost: { id: string; missing: string[] }[] = [];
-    for (const r of RECIPES) {
+    for (const r of t.recipes) {
       const missing = r.ingredients.map((i) => i.id).filter((id) => !pantry.includes(id));
       if (missing.length === 0) ready.push({ id: r.id, missing });
       else if (missing.length === 1) almost.push({ id: r.id, missing });
     }
     return { ready, almost };
-  }, [pantry]);
-
-  const recipeOf = (id: string) => RECIPES.find((r) => r.id === id)!;
+  }, [pantry, t]);
 
   return (
     <div className="space-y-6">
-      <SectionTitle sub="Coche ce que tu as chez toi, on s'occupe du reste.">
-        Ton garde-manger
-      </SectionTitle>
+      <SectionTitle sub={ui.pantrySub}>{ui.pantryTitle}</SectionTitle>
 
       <div className="flex items-center gap-2 rounded-2xl border border-lime/25 bg-lime/10 px-4 py-3">
         <Refrigerator size={18} className="shrink-0 text-lime" />
         <p className="text-sm">
-          <span className="font-bold text-lime">{pantry.length}</span> ingrédient
-          {pantry.length > 1 ? "s" : ""} coché{pantry.length > 1 ? "s" : ""}
+          <span className="font-bold text-lime">{pantry.length}</span> {ui.pantryCount(pantry.length)}
         </p>
         {pantry.length > 0 && (
           <button
             onClick={() => pantry.forEach(toggleItem)}
             className="ml-auto text-xs font-semibold text-white/50 underline"
           >
-            Tout effacer
+            {ui.pantryClear}
           </button>
         )}
       </div>
 
       <div className="space-y-3">
-        {PANTRY.map((cat) => {
+        {t.pantry.map((cat) => {
           const count = cat.items.filter((i) => pantry.includes(i.id)).length;
           const open = openCat === cat.id;
           return (
@@ -120,13 +117,11 @@ export default function Pantry({
             <section>
               <div className="mb-3 flex items-center gap-2">
                 <Sparkles size={18} className="text-lime" />
-                <h2 className="font-display text-xl font-bold">
-                  Tu peux faire ça maintenant ({ready.length})
-                </h2>
+                <h2 className="font-display text-xl font-bold">{ui.pantryReady(ready.length)}</h2>
               </div>
               <div className="grid gap-3">
                 {ready.map(({ id, missing }, i) => {
-                  const r = recipeOf(id);
+                  const r = recipeById(id)!;
                   return (
                     <RecipeCard
                       key={id}
@@ -146,11 +141,11 @@ export default function Pantry({
           {almost.length > 0 && (
             <section>
               <h2 className="font-display mb-3 text-xl font-bold">
-                Il te manque juste un ingrédient ({almost.length})
+                {ui.pantryAlmost(almost.length)}
               </h2>
               <div className="grid gap-3">
                 {almost.map(({ id, missing }, i) => {
-                  const r = recipeOf(id);
+                  const r = recipeById(id)!;
                   return (
                     <RecipeCard
                       key={id}
@@ -169,8 +164,7 @@ export default function Pantry({
 
           {ready.length === 0 && almost.length === 0 && (
             <p className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center text-sm text-white/55">
-              Hmm, avec ça on ne peut rien assembler pour l'instant. Coche encore quelques trucs,
-              surtout des jus et de l'eau pétillante, et la magie va opérer.
+              {ui.pantryEmpty}
             </p>
           )}
         </div>
@@ -178,11 +172,8 @@ export default function Pantry({
 
       {pantry.length === 0 && (
         <p className="rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/50">
-          Coche tes ingrédients ci-dessus et Mirage te dira quels drinks tu peux te verser
-          <span className="text-white/70"> sans sortir de chez toi</span>. Promis, c'est le fun.
-          <span className="mt-2 block text-xs text-white/35">
-            Astuce : la glace, on assume que tu en as.
-          </span>
+          {ui.pantryZero}
+          <span className="mt-2 block text-xs text-white/35">{ui.pantryZeroTip}</span>
         </p>
       )}
     </div>

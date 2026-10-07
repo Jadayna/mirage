@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Flame, PartyPopper, RotateCcw } from "lucide-react";
 import { useState } from "react";
-import { MILESTONES, daysBetween } from "../data";
+import { useI18n } from "../i18n";
+import { daysBetween } from "../data";
 import type { Profile } from "../store";
 import { SectionTitle } from "./ui";
 
@@ -18,16 +19,18 @@ export default function ProfileView({
   pantryCount: number;
   onReset: () => void;
 }) {
+  const { t } = useI18n();
+  const ui = t.ui;
   const [name, setName] = useState(profile.name);
   const showSober = profile.soberOptIn && profile.soberStart;
   const days = showSober ? daysBetween(profile.soberStart!) : 0;
-  const reached = MILESTONES.filter((m) => m.days <= days);
+  const reached = t.milestones.filter((m) => m.days <= days);
 
   const setSober = (on: boolean) => {
     if (on) {
-      const t = new Date();
-      const iso = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
-        t.getDate()
+      const t0 = new Date();
+      const iso = `${t0.getFullYear()}-${String(t0.getMonth() + 1).padStart(2, "0")}-${String(
+        t0.getDate()
       ).padStart(2, "0")}`;
       setProfile((p) => ({ ...p, soberOptIn: true, soberStart: p.soberStart ?? iso }));
     } else {
@@ -37,11 +40,11 @@ export default function ProfileView({
 
   return (
     <div className="space-y-6">
-      <SectionTitle sub="Tout est modifiable, rien n'est imposé.">Ton profil</SectionTitle>
+      <SectionTitle sub={ui.profileSub}>{ui.profileTitle}</SectionTitle>
 
       <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-5">
         <label className="text-xs font-semibold uppercase tracking-widest text-white/45">
-          Ton prénom
+          {ui.profileName}
         </label>
         <input
           value={name}
@@ -55,11 +58,11 @@ export default function ProfileView({
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 text-center">
           <p className="font-display text-3xl font-extrabold text-lime">{favCount}</p>
-          <p className="mt-1 text-xs text-white/55">drinks favoris</p>
+          <p className="mt-1 text-xs text-white/55">{ui.profileFavDrinks}</p>
         </div>
         <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-5 text-center">
           <p className="font-display text-3xl font-extrabold text-soleil">{pantryCount}</p>
-          <p className="mt-1 text-xs text-white/55">ingrédients au garde-manger</p>
+          <p className="mt-1 text-xs text-white/55">{ui.profilePantryItems}</p>
         </div>
       </div>
 
@@ -67,15 +70,13 @@ export default function ProfileView({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="font-display flex items-center gap-2 text-lg font-bold">
-              <Flame size={18} className="text-menthe" /> Compteur de sobriété
+              <Flame size={18} className="text-menthe" /> {ui.profileSoberTitle}
             </p>
-            <p className="mt-1 text-sm text-white/60">
-              Un petit suivi doux, juste pour toi. Tu peux le retirer n'importe quand.
-            </p>
+            <p className="mt-1 text-sm text-white/60">{ui.profileSoberText}</p>
           </div>
           <button
             onClick={() => setSober(!profile.soberOptIn)}
-            aria-label="Activer ou désactiver le compteur"
+            aria-label={ui.profileSoberTitle}
             className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${
               profile.soberOptIn ? "bg-menthe" : "bg-white/15"
             }`}
@@ -94,7 +95,7 @@ export default function ProfileView({
           <div className="mt-4">
             <div className="flex items-baseline gap-2">
               <span className="font-display text-4xl font-extrabold">{days}</span>
-              <span className="text-white/60">jour{days > 1 ? "s" : ""} sans alcool</span>
+              <span className="text-white/60">{ui.homeDaysSober(days)}</span>
             </div>
             {reached.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
@@ -115,15 +116,15 @@ export default function ProfileView({
             )}
             <button
               onClick={() => {
-                const t = new Date();
-                const iso = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
-                  t.getDate()
+                const t0 = new Date();
+                const iso = `${t0.getFullYear()}-${String(t0.getMonth() + 1).padStart(2, "0")}-${String(
+                  t0.getDate()
                 ).padStart(2, "0")}`;
                 setProfile((p) => ({ ...p, soberStart: iso }));
               }}
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white/45 underline"
             >
-              <RotateCcw size={12} /> Recommencer le compteur à aujourd'hui
+              <RotateCcw size={12} /> {ui.profileRestart}
             </button>
           </div>
         )}
@@ -133,11 +134,9 @@ export default function ProfileView({
         onClick={onReset}
         className="w-full rounded-2xl border border-white/10 bg-white/[0.03] py-3 text-sm font-semibold text-white/45"
       >
-        Recommencer l'app à zéro
+        {ui.profileReset}
       </button>
-      <p className="pb-6 text-center text-xs text-white/30">
-        Mirage garde tout sur ton téléphone. Rien n'est envoyé nulle part.
-      </p>
+      <p className="pb-6 text-center text-xs text-white/30">{ui.profilePrivacy}</p>
     </div>
   );
 }

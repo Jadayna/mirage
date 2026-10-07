@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Lightbulb } from "lucide-react";
 import { useState } from "react";
-import { MOODS, recipeById } from "../data";
+import { useI18n } from "../i18n";
 import { RecipeCard, SectionTitle } from "./ui";
 
 export default function Mood({
@@ -15,17 +15,17 @@ export default function Mood({
   onOpenRecipe: (id: string) => void;
   preselected?: string;
 }) {
+  const { t, recipeById } = useI18n();
+  const ui = t.ui;
   const [moodId, setMoodId] = useState<string | null>(preselected ?? null);
-  const mood = MOODS.find((m) => m.id === moodId);
+  const mood = t.moods.find((m) => m.id === moodId);
 
   return (
     <div className="space-y-5">
-      <SectionTitle sub="Dis-nous comment tu te sens, on te propose le drink qui va avec.">
-        Comment tu te sens?
-      </SectionTitle>
+      <SectionTitle sub={ui.moodSub}>{ui.moodTitle}</SectionTitle>
 
       <div className="grid grid-cols-3 gap-2.5">
-        {MOODS.map((m, i) => (
+        {t.moods.map((m, i) => (
           <motion.button
             key={m.id}
             initial={{ opacity: 0, scale: 0.9 }}
@@ -47,7 +47,7 @@ export default function Mood({
 
       {!mood && (
         <p className="rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/50">
-          Choisis une humeur ci-dessus et Mirage te concocte une petite sélection sur mesure.
+          {ui.moodEmpty}
         </p>
       )}
 

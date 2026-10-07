@@ -1,16 +1,9 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Flame, PartyPopper } from "lucide-react";
-import { MILESTONES, MOODS, RECIPES, daysBetween, recipeById } from "../data";
+import { useI18n } from "../i18n";
+import { daysBetween } from "../data";
 import type { Profile } from "../store";
 import { PourGlass } from "./ui";
-
-function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 5) return "Bonne nuit";
-  if (h < 12) return "Bon matin";
-  if (h < 18) return "Bon après-midi";
-  return "Bonsoir";
-}
 
 export default function Home({
   profile,
@@ -23,10 +16,21 @@ export default function Home({
   onOpenRecipe: (id: string) => void;
   goTab: (t: string) => void;
 }) {
-  const spotlight = RECIPES[new Date().getDate() % RECIPES.length];
+  const { t, recipeById } = useI18n();
+  const ui = t.ui;
+
+  const greeting = (): string => {
+    const h = new Date().getHours();
+    if (h < 5) return ui.greetNight;
+    if (h < 12) return ui.greetMorning;
+    if (h < 18) return ui.greetAfternoon;
+    return ui.greetEvening;
+  };
+
+  const spotlight = t.recipes[new Date().getDate() % t.recipes.length];
   const showSober = profile.soberOptIn && profile.soberStart;
   const days = showSober ? daysBetween(profile.soberStart!) : 0;
-  const nextMilestone = MILESTONES.find((m) => m.days > days);
+  const nextMilestone = t.milestones.find((m) => m.days > days);
   const favRecipes = favorites.map(recipeById).filter(Boolean);
 
   return (
@@ -50,11 +54,11 @@ export default function Home({
             transition={{ delay: 0.08 }}
             className="font-display mt-1 text-4xl font-extrabold leading-[1.05]"
           >
-            Qu'est-ce qu'on{" "}
+            {ui.homeTitleA}{" "}
             <span className="bg-gradient-to-r from-lime via-soleil to-corail bg-clip-text text-transparent">
-              se verse
+              {t.lang === "fr" ? "se verse" : "pouring"}
             </span>{" "}
-            aujourd'hui?
+            {ui.homeTitleB}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -62,7 +66,7 @@ export default function Home({
             transition={{ delay: 0.16 }}
             className="mt-2 max-w-[240px] text-sm text-white/60"
           >
-            Des drinks festifs, zéro alcool, avec ce que tu as chez toi.
+            {ui.homeSub}
           </motion.p>
           <div className="mt-4 flex justify-center py-2">
             <div className="drift">
@@ -77,7 +81,7 @@ export default function Home({
             onClick={() => goTab("mood")}
             className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 font-display font-extrabold text-nuit"
           >
-            Comment tu te sens? <ArrowRight size={18} />
+            {ui.homeMoodCta} <ArrowRight size={18} />
           </motion.button>
         </div>
       </div>
@@ -85,12 +89,12 @@ export default function Home({
       {/* Drink du moment */}
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold">Le drink du moment</h2>
+          <h2 className="font-display text-xl font-bold">{ui.homeSpotlight}</h2>
           <button
             onClick={() => goTab("recipes")}
             className="text-sm font-semibold text-lime"
           >
-            Tout voir
+            {ui.homeSeeAll}
           </button>
         </div>
         <motion.button
@@ -111,7 +115,7 @@ export default function Home({
             </div>
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-widest text-white/45">
-                Suggestion du jour
+                {ui.homeTodayPick}
               </p>
               <h3 className="font-display text-xl font-bold">{spotlight.name}</h3>
               <p className="line-clamp-1 text-sm text-white/55">{spotlight.tagline}</p>
@@ -122,9 +126,9 @@ export default function Home({
 
       {/* Humeurs rapides */}
       <section>
-        <h2 className="font-display mb-3 text-xl font-bold">Ton humeur, ton drink</h2>
+        <h2 className="font-display mb-3 text-xl font-bold">{ui.homeMoodTitle}</h2>
         <div className="flex gap-2.5 overflow-x-auto pb-2 nice-scroll">
-          {MOODS.map((m, i) => (
+          {t.moods.map((m, i) => (
             <motion.button
               key={m.id}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -150,20 +154,19 @@ export default function Home({
         >
           <div className="flex items-center gap-2 text-menthe">
             <Flame size={18} />
-            <span className="text-sm font-semibold uppercase tracking-widest">Mon parcours</span>
+            <span className="text-sm font-semibold uppercase tracking-widest">{ui.homeJourney}</span>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="font-display text-5xl font-extrabold">{days}</span>
-            <span className="text-white/60">jour{days > 1 ? "s" : ""} sans alcool</span>
+            <span className="text-white/60">{ui.homeDaysSober(days)}</span>
           </div>
           {nextMilestone ? (
             <p className="mt-2 text-sm text-white/60">
-              Prochain palier : <span className="font-semibold text-white">{nextMilestone.label}</span>{" "}
-              dans {nextMilestone.days - days} jour{nextMilestone.days - days > 1 ? "s" : ""}.
+              {ui.homeNextMilestone(nextMilestone.label, nextMilestone.days - days)}
             </p>
           ) : (
             <p className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-menthe">
-              <PartyPopper size={16} /> Un an! Tu es la preuve que c'est possible.
+              <PartyPopper size={16} /> {ui.homeOneYear}
             </p>
           )}
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
@@ -183,9 +186,9 @@ export default function Home({
       {favRecipes.length > 0 && (
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-display text-xl font-bold">Tes favoris</h2>
+            <h2 className="font-display text-xl font-bold">{ui.homeFavs}</h2>
             <button onClick={() => goTab("recipes:fav")} className="text-sm font-semibold text-lime">
-              Tout voir
+              {ui.homeSeeAll}
             </button>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 nice-scroll">
@@ -203,7 +206,7 @@ export default function Home({
                   🍹
                 </div>
                 <p className="font-display text-sm font-bold leading-tight">{r!.name}</p>
-                <p className="mt-0.5 text-[11px] text-white/50">{r!.minutes} min</p>
+                <p className="mt-0.5 text-[11px] text-white/50">{ui.minutesShort(r!.minutes)}</p>
               </motion.button>
             ))}
           </div>

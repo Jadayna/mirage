@@ -3,7 +3,7 @@
 **Nom de travail :** Mirage (3 noms candidats pour le lancement : Mirage, Sobre & Fun, Zéro Preuve)
 **Type :** PWA mobile-first, React + Vite + Tailwind v4, framer-motion
 **Repo :** https://github.com/Jadayna/mirage (main)
-**Langue V1 :** français québécois (toggle EN envisagé en phase 2)
+**Langue V1 :** bilingue FR/EN (2026-10-06). Toggle FR/EN flottant en haut à droite, visible sur tous les écrans. Langue par défaut : langue du navigateur (EN ou FR), sinon FR. Choix persisté en localStorage (`mirage:lang:v1`). Français québécois inchangé (sans tirets longs) ; anglais naturel, noms de drinks adaptés (pas du mot-à-mot).
 **Backend V1 :** aucun, tout en localStorage
 
 ## Concept
@@ -65,10 +65,10 @@ Suprême (payant, phase 2) :
 - Stripe (compte Axe C Studio existant) : packs thématiques + suprême
 - Banque de recettes extensible côté serveur, soumissions de la communauté (modération)
 - Notifications douces optionnelles (rappel du rituel du vendredi, nouveau pack)
-- Toggle EN
 
 ## Notes techniques
 
-- Persistance : localStorage, clés `mirage:profile:v1`, `mirage:pantry:v1`, `mirage:favorites:v1`
+- Persistance : localStorage, clés `mirage:profile:v1`, `mirage:pantry:v1`, `mirage:favorites:v1`, `mirage:lang:v1`
+- i18n : `src/i18n/` (`types.ts`, `fr.ts`, `en.ts`, `index.tsx`) ; les données FR d'origine (`src/data.ts`) sont inchangées, l'anglais vit dans `en.ts` avec les mêmes ids
 - Aucune donnée envoyée nulle part (mentionné dans le profil, argument confiance)
 - PWA installable, theme-color #160a24

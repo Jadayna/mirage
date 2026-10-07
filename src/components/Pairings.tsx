@@ -1,21 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, FlaskConical, X } from "lucide-react";
 import { useState } from "react";
-import { PAIRINGS, recipeById } from "../data";
+import { useI18n } from "../i18n";
 import { SectionTitle } from "./ui";
 
 export default function Pairings({ onOpenRecipe }: { onOpenRecipe: (id: string) => void }) {
+  const { t, recipeById } = useI18n();
+  const ui = t.ui;
   const [openId, setOpenId] = useState<string | null>(null);
-  const open = PAIRINGS.find((p) => p.id === openId);
+  const open = t.pairings.find((p) => p.id === openId);
 
   return (
     <div className="space-y-4">
-      <SectionTitle sub="Des duos qui marchent à tout coup. Touche un accord pour voir les drinks qui l'utilisent.">
-        Accords de saveurs
-      </SectionTitle>
+      <SectionTitle sub={ui.pairingsSub}>{ui.pairingsTitle}</SectionTitle>
 
       <div className="grid grid-cols-2 gap-3">
-        {PAIRINGS.map((p, i) => (
+        {t.pairings.map((p, i) => (
           <motion.button
             key={p.id}
             initial={{ opacity: 0, y: 18 }}
@@ -71,7 +71,7 @@ export default function Pairings({ onOpenRecipe }: { onOpenRecipe: (id: string) 
                 <button
                   onClick={() => setOpenId(null)}
                   className="rounded-full bg-white/10 p-2"
-                  aria-label="Fermer"
+                  aria-label={ui.pairingsClose}
                 >
                   <X size={16} />
                 </button>
@@ -81,7 +81,7 @@ export default function Pairings({ onOpenRecipe }: { onOpenRecipe: (id: string) 
                 {open.note}
               </p>
               <p className="font-display mt-5 text-sm font-bold uppercase tracking-widest text-white/45">
-                Drinks avec cet accord
+                {ui.pairingsDrinks}
               </p>
               <div className="mt-2 space-y-2">
                 {open.recipes.map((rid) => {

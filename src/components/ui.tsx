@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Clock, Heart } from "lucide-react";
 import { useMemo } from "react";
-import { INGREDIENT_LABEL, LEVEL_LABEL, type Level, type Recipe } from "../data";
+import { useI18n } from "../i18n";
+import type { Level, Recipe } from "../data";
 
 /* ---------- Bulles flottantes d'arrière-plan ---------- */
 
@@ -54,11 +55,12 @@ const LEVEL_STYLES: Record<Level, string> = {
 };
 
 export function LevelBadge({ level }: { level: Level }) {
+  const { t } = useI18n();
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${LEVEL_STYLES[level]}`}
     >
-      {LEVEL_LABEL[level]}
+      {t.levelLabel[level]}
     </span>
   );
 }
@@ -136,6 +138,8 @@ export function RecipeCard({
   missing?: string[];
   index?: number;
 }) {
+  const { t } = useI18n();
+  const ui = t.ui;
   return (
     <motion.button
       initial={{ opacity: 0, y: 24 }}
@@ -154,18 +158,18 @@ export function RecipeCard({
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <LevelBadge level={recipe.level} />
             <span className="inline-flex items-center gap-1 text-xs text-white/50">
-              <Clock size={12} /> {recipe.minutes} min
+              <Clock size={12} /> {ui.minutesShort(recipe.minutes)}
             </span>
           </div>
           <h3 className="font-display text-lg font-bold leading-tight">{recipe.name}</h3>
           <p className="mt-1 line-clamp-2 text-sm text-white/60">{recipe.tagline}</p>
           {missing && missing.length > 0 && (
             <p className="mt-2 text-xs font-medium text-soleil">
-              Il te manque juste : {missing.map((m) => INGREDIENT_LABEL[m]).join(", ")}
+              {ui.cardMissing(missing.map((m) => t.ingredientLabel[m] ?? m).join(", "))}
             </p>
           )}
           {missing && missing.length === 0 && (
-            <p className="mt-2 text-xs font-semibold text-lime">Tu as tout ce qu'il faut</p>
+            <p className="mt-2 text-xs font-semibold text-lime">{ui.cardReady}</p>
           )}
         </div>
         <button
@@ -173,7 +177,7 @@ export function RecipeCard({
             e.stopPropagation();
             onToggleFav();
           }}
-          aria-label={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
+          aria-label={isFav ? ui.recipeDetailFavRemove : ui.recipeDetailFavAdd}
           className={`shrink-0 rounded-full p-2 transition-transform active:scale-90 ${
             isFav ? "bg-corail/20 text-corail" : "bg-white/10 text-white/50 hover:text-white"
           }`}
