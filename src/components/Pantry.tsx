@@ -39,7 +39,7 @@ export default function Pantry({
       <div className="flex items-center gap-2 rounded-2xl border border-lime/25 bg-lime/10 px-4 py-3">
         <Refrigerator size={18} className="shrink-0 text-lime" />
         <p className="text-sm">
-          <span className="font-bold text-lime">{pantry.length}</span> {ui.pantryCount(pantry.length)}
+          <span className="font-bold text-lime">{pantry.length}</span>{' '}{ui.pantryCount(pantry.length)}
         </p>
         {pantry.length > 0 && (
           <button
